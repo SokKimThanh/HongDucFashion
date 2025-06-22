@@ -1,0 +1,29 @@
+﻿@page "/"
+@using HongDucFashion.Pages.FE.Product
+@using HongDucFashion.Services
+
+@inject ProductsService ProductsService
+
+<div class="hd-home-banner">
+    <div class="hd-home-banner-content">
+        <h1>Hồng Đức Fashion</h1>
+        <p>Khuyến mãi lớn dịp lễ – Ưu đãi cực sốc cho mọi khách hàng!</p>
+    </div>
+</div>
+
+<div class="hd-home-section">
+    <h2 class="hd-title">Danh mục nổi bật</h2>
+    <div class="hd-category-grid">
+        <div class="hd-category-card">Áo sơ mi</div>
+        <div class="hd-category-card">Quần tây</div>
+        <div class="hd-category-card">Đầm váy</div>
+        <div class="hd-category-card">Áo khoác</div>
+        <div class="hd-category-card">Phụ kiện</div>
+    </div>
+</div>
+
+<div class="hd-home-section">
+    <h2 class="hd-title">Sản phẩm nổi bật</h2>
+    <ProductList ShowHeader="false" ShowSearch="false" ShowOnlyFeatured="true" />
+
+</div>

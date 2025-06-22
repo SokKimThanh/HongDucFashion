@@ -1,0 +1,42 @@
+﻿@using HongDucFashion.Pages
+@using HongDucFashion.Services
+@inject NavigationManager NavigationManager
+@inject AuthenticationStateProvider AuthProvider
+<CascadingAuthenticationState>
+    <Router AppAssembly="@typeof(App).Assembly">
+        <Found Context="routeData">
+            <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)">
+                <NotAuthorized>
+                    <NotAuthorized />
+                </NotAuthorized>
+            </AuthorizeRouteView>
+        </Found>
+        <NotFound>
+            @if (NavigationManager.Uri.Contains("/admin"))
+            {
+                <LayoutView Layout="@typeof(AdminLayout)">
+                    <PageNotFound />
+                </LayoutView>
+            }
+            else
+            {
+                <LayoutView Layout="@typeof(MainLayout)">
+                    <PageNotFound />
+                </LayoutView>
+            }
+        </NotFound>
+    </Router>
+</CascadingAuthenticationState>
+
+@code {
+    protected override Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            // Gọi lại NotifyAuthenticationStateChanged để cập nhật trạng thái sau khi client đã load
+            (AuthProvider as ApiAuthenticationStateProvider)?.ForceRefresh();
+        }
+
+        return Task.CompletedTask;
+    }
+}

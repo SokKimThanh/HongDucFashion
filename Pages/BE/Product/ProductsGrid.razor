@@ -1,0 +1,118 @@
+﻿@page "/admin/product"
+@attribute [Authorize(Roles = "Admin")]
+@layout AdminLayout
+
+@using HongDucFashion.Models
+@using HongDucFashion.Services
+
+@inject ProductsService ProductsService 
+@inject NavigationManager NavigationManager
+
+<h2 class="hd-title">Danh sách sản phẩm</h2>
+
+<div class="hd-table-container">
+    <button class="hd-btn hd-btn-primary" @onclick="CreateProduct">Thêm sản phẩm</button>
+    @if (!string.IsNullOrEmpty(alertMessage))
+    {
+        <div class="hd-alert @(alertIsSuccess ? "hd-alert-success" : "hd-alert-error")">
+            <span class="hd-alert-icon">
+                @(alertIsSuccess ? "✔️" : "❌")
+            </span>
+            <span>@alertMessage</span>
+        </div>
+    }
+    <table class="hd-table">
+        <thead>
+            <tr>
+                <th>Mã</th>
+                <th>Tên sản phẩm</th>
+                <th>Giá</th>
+                <th>Loại</th>
+                <th>Nhà cung cấp</th>
+                <th>Số lượng</th>
+                <th>Thao tác</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (products == null)
+            {
+                <tr>
+                    <td colspan="7" class="hd-text-center">Đang tải...</td>
+                </tr>
+            }
+            else if (!products.Any())
+            {
+                <tr>
+                    <td colspan="7" class="hd-text-center">Không có sản phẩm nào.</td>
+                </tr>
+            }
+            else
+            {
+                @foreach (var p in products)
+                {
+                    <tr>
+                        <td>@p.ProductId</td>
+                        <td>@p.ProductName</td>
+                        <td>@(p.Price?.ToString("N0") ?? "-")</td>
+                        <td>@p.Category?.CategoryName</td>
+                        <td>@p.Supplier?.SupplierName</td>
+                        <td>@p.AvailableQuantity</td>
+                        <td>
+                            <button class="hd-btn hd-btn-small" @onclick="() => EditProduct(p.ProductId)">Sửa</button>
+                            <button class="hd-btn hd-btn-danger hd-btn-small" @onclick="() => DeleteProduct(p.ProductId)">Xóa</button>
+                        </td>
+                    </tr>
+                }
+            }
+        </tbody>
+    </table>
+</div>
+
+@code {
+    private List<Product>? products;
+    private string? alertMessage;
+    private bool alertIsSuccess;
+
+    protected override async Task OnInitializedAsync()
+    {
+        products = await ProductsService.GetAllProductsAsync();
+    }
+
+    private void CreateProduct()
+    {
+        NavigationManager.NavigateTo("/admin/product/create");
+    }
+
+    private void EditProduct(int id)
+    {
+        NavigationManager.NavigateTo($"/admin/product/edit/{id}");
+    }
+
+    private async Task DeleteProduct(int id)
+    {
+        if (await JS.InvokeAsync<bool>("confirm", $"Bạn có chắc muốn xóa sản phẩm #{id}?"))
+        {
+            var response = await ProductsService.DeleteProductAsync(id);
+            if (response.IsSuccessStatusCode)
+            {
+                var result = await response.Content.ReadFromJsonAsync<Dictionary<string, string>>();
+                alertMessage = result != null && result.ContainsKey("Message")
+                    ? result["Message"]
+                    : "Xóa sản phẩm thành công.";
+                alertIsSuccess = true;
+                products = await ProductsService.GetAllProductsAsync();
+            }
+            else
+            {
+                var error = await response.Content.ReadFromJsonAsync<Dictionary<string, string>>();
+                alertMessage = error != null && error.ContainsKey("Message")
+                    ? error["Message"]
+                    : "Xóa sản phẩm thất bại.";
+                alertIsSuccess = false;
+            }
+            StateHasChanged();
+        }
+    }
+
+    [Inject] IJSRuntime JS { get; set; } = default!;
+}

@@ -1,0 +1,36 @@
+﻿@using Microsoft.AspNetCore.Components.Authorization
+@inject AuthenticationStateProvider AuthProvider
+
+@inherits LayoutComponentBase
+
+<PageTitle>Admin - HongDucFashion</PageTitle>
+<div class="hd-layout">
+    <header class="hd-header">
+        <a href="/" class="hd-header-logo">Hồng Đức Admin</a>
+    </header>
+    <div class="hd-content-flex">
+        @if (isAdmin)
+        {
+            <aside class="hd-sidebar">
+                <AdminNavMenu />
+            </aside>
+        }
+        <main class="hd-main-content">
+            @Body
+        </main>
+    </div>
+    <footer class="hd-footer">
+        &copy; @DateTime.Now.Year Hồng Đức Fashion Admin.
+    </footer>
+</div>
+
+@code {
+    private bool isAdmin;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        isAdmin = user.Identity?.IsAuthenticated == true && user.IsInRole("Admin");
+    }
+}

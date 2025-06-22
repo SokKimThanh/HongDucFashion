@@ -1,0 +1,16 @@
+﻿@inherits LayoutComponentBase
+
+<div class="hd-layout">
+    <header class="hd-header">
+        <a href="/" class="hd-header-logo">MyShop</a>
+        <nav>
+            <NavMenu />
+        </nav>
+    </header>
+    <main class="hd-main-content">
+        @Body
+    </main>
+    <footer class="hd-footer">
+        &copy; @DateTime.Now.Year MyShop. All rights reserved.
+    </footer>
+</div>

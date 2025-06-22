@@ -1,0 +1,45 @@
+﻿@using HongDucFashion.Models
+
+<div class="hd-product-card">
+    <div class="hd-product-card-img">
+        <img src="@ImageUrl" alt="@Product?.ProductName" />
+    </div>
+    <div class="hd-product-card-body">
+        <div class="hd-product-card-title">@Product?.ProductName</div>
+        <div class="hd-product-card-price">@((Product?.Price ?? 0).ToString("N0")) đ</div>
+        <div class="hd-product-card-meta">
+            <span>Kho: @Product?.AvailableQuantity</span>
+        </div>
+        <div class="hd-product-card-actions" style="margin-top:auto;display:flex;gap:0.5em;">
+            <button class="hd-btn hd-btn-small" @onclick="ViewDetail">Xem chi tiết</button>
+            <button class="hd-btn hd-btn-small hd-btn-primary" @onclick="AddToCart">Thêm vào giỏ</button>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter] public Product? Product { get; set; }
+    [Parameter] public EventCallback<int> OnViewDetail { get; set; }
+    [Parameter] public EventCallback<int> OnAddToCart { get; set; }
+    [Parameter] public string? ImageUrl { get; set; }
+
+    private void ViewDetail()
+    {
+        if (Product != null)
+            OnViewDetail.InvokeAsync(Product.ProductId);
+    }
+
+    private void AddToCart()
+    {
+        if (Product != null)
+            OnAddToCart.InvokeAsync(Product.ProductId);
+    }
+
+    protected override void OnParametersSet()
+    {
+        if (string.IsNullOrWhiteSpace(ImageUrl))
+        {
+            ImageUrl = "https://placehold.co/600x400/EEE/31343C?font=raleway&text=Image";
+        }
+    }
+}

@@ -1,0 +1,51 @@
+﻿@page "/login"
+@using HongDucFashion.ModelDTO
+@using HongDucFashion.Services
+
+@inject AuthApiService AuthApi
+@inject NavigationManager NavManager
+@inject ApiAuthenticationStateProvider AuthStateProvider
+
+<div class="hd-login-outer">
+    <div class="hd-login-card-new">
+        <div class="hd-login-title">Đăng nhập</div>
+        <EditForm Model="loginData" OnValidSubmit="PerformLogin" class="hd-login-form-new">
+            <div class="hd-login-field">
+                <label for="username" class="hd-login-label">Tên đăng nhập</label>
+                <InputText id="username" @bind-Value="loginData.Email" class="hd-input hd-login-input-new" placeholder="email-dangnhap@gmail.com" />
+            </div>
+            <div class="hd-login-field">
+                <label for="password" class="hd-login-label">Mật khẩu</label>
+                <InputText id="password" @bind-Value="loginData.Password" class="hd-input hd-login-input-new" type="password" placeholder="Nhập mật khẩu" />
+            </div>
+            <button type="submit" class="hd-btn hd-btn-primary hd-login-btn-new">Đăng nhập</button>
+            @if (!string.IsNullOrEmpty(errorMessage))
+            {
+                <div class="hd-alert hd-alert-error hd-login-error">@errorMessage</div>
+            }
+        </EditForm>
+    </div>
+</div>
+
+@code {
+    private LoginRequest loginData = new();
+    private string? errorMessage;
+
+    private async Task PerformLogin()
+    {
+        var result = await AuthApi.LoginAsync(loginData);
+        if (result != null)
+        {
+            var roles = result.Roles ?? new List<string>(); // Ensure roles is not null
+            await AuthStateProvider.MarkUserAsAuthenticated(result.UserName, roles);
+            if (roles.Contains("Admin"))
+                NavManager.NavigateTo("/admin", true);
+            else
+                NavManager.NavigateTo("/", true);
+        }
+        else
+        {
+            errorMessage = "Đăng nhập thất bại! Vui lòng kiểm tra lại thông tin.";
+        }
+    }
+}

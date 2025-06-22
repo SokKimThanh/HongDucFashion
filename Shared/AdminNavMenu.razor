@@ -1,0 +1,47 @@
+﻿@using HongDucFashion.Services
+@inject AuthApiService AuthApiService
+@inject NavigationManager NavigationManager
+@inject ApiAuthenticationStateProvider authStateProvider
+
+<ul class="hd-nav-vertical">
+    <li>
+        <CustomNavLink Href="/admin" Classes="hd-sidebar-link" Match="NavLinkMatch.All">
+            Dashboard
+        </CustomNavLink>
+    </li>
+    <li>
+        <CustomNavLink Href="/admin/product" Classes="hd-sidebar-link">
+            Sản phẩm
+        </CustomNavLink>
+    </li>
+    <li>
+        <CustomNavLink Href="/admin/category" Classes="hd-sidebar-link">
+            Danh mục
+        </CustomNavLink>
+    </li>
+    <li>
+        <CustomNavLink Href="/admin/order" Classes="hd-sidebar-link">
+            Đơn hàng
+        </CustomNavLink>
+    </li>
+    <li>
+        <CustomNavLink Href="/admin/user" Classes="hd-sidebar-link">
+            Người dùng
+        </CustomNavLink>
+    </li>
+    <li>
+        <button class="hd-sidebar-link" @onclick="Logout" style="width:100%;text-align:left;background:none;border:none;cursor:pointer;">
+            Đăng xuất
+        </button>
+    </li>
+</ul>
+
+@code {
+
+    private async Task Logout()
+    {
+        await AuthApiService.LogoutAsync();
+        await authStateProvider.MarkUserAsLoggedOut();
+        NavigationManager.NavigateTo("/login", true);
+    }
+}

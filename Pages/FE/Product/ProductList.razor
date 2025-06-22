@@ -1,0 +1,106 @@
+﻿@page "/product"
+
+@using HongDucFashion.Models
+@using HongDucFashion.Services
+@using HongDucFashion.Pages.Components
+@inject NavigationManager NavigationManager
+
+@inject ProductsService ProductsService
+
+@if (ShowHeader)
+{
+    <h2 class="hd-title">Tất cả sản phẩm</h2>
+}
+
+@if (ShowSearch)
+{
+    <div class="hd-product-search">
+        <input class="hd-input" placeholder="Tìm kiếm sản phẩm..." @bind="searchTerm" @bind:event="oninput" />
+        <button class="hd-btn" @onclick="Search">Tìm</button>
+    </div>
+}
+
+<div class="hd-product-grid">
+    @if (products == null)
+    {
+        <div class="hd-text-center" style="grid-column: 1/-1;">Đang tải...</div>
+    }
+    else if (!products.Any())
+    {
+        <div class="hd-text-center" style="grid-column: 1/-1;">Không có sản phẩm nào.</div>
+    }
+    else
+    {
+        @foreach (var p in products)
+        {
+            <ProductCard Product="p"
+                         OnViewDetail="ViewDetail"
+                         OnAddToCart="AddToCart" />
+        }
+    }
+</div>
+
+@if (!string.IsNullOrEmpty(addToCartMessage))
+{
+    <div class="alert alert-success" style="margin-top:1rem;">@addToCartMessage</div>
+}
+
+@code {
+    [Parameter] public bool ShowHeader { get; set; } = true;
+    [Parameter] public bool ShowSearch { get; set; } = true;
+    [Parameter] public bool ShowOnlyFeatured { get; set; } = false;
+
+    private List<Product>? products;
+    private string searchTerm = "";
+    private string? addToCartMessage;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadProducts();
+    }
+
+    private async Task LoadProducts()
+    {
+        var all = await ProductsService.GetAllProductsAsync() ?? new();
+        if (ShowOnlyFeatured)
+            products = all.Take(6).ToList();
+        else
+            products = all;
+    }
+
+    private async Task Search()
+    {
+        var all = await ProductsService.GetAllProductsAsync() ?? new();
+        if (!string.IsNullOrWhiteSpace(searchTerm))
+            products = all.Where(p => (p.ProductName ?? "").Contains(searchTerm, StringComparison.OrdinalIgnoreCase)).ToList();
+        else
+            products = all;
+    }
+
+    private void ViewDetail(int id)
+    {
+        NavigationManager.NavigateTo($"/product/{id}");
+    }
+
+    private async Task AddToCart(int productId)
+    {
+        // Giả lập thêm vào giỏ, thực tế nên gọi CartService hoặc API
+        addToCartMessage = null;
+        var product = products?.FirstOrDefault(p => p.ProductId == productId);
+        if (product == null)
+        {
+            addToCartMessage = "Không tìm thấy sản phẩm.";
+            StateHasChanged();
+            return;
+        }
+
+        // TODO: Thay thế bằng logic thực tế (gọi CartService hoặc API)
+        addToCartMessage = $"Đã thêm \"{product.ProductName}\" vào giỏ hàng!";
+        StateHasChanged();
+
+        // Ẩn thông báo sau 2 giây
+        await Task.Delay(2000);
+        addToCartMessage = null;
+        StateHasChanged();
+    }
+}

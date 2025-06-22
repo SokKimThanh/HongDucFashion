@@ -1,0 +1,29 @@
+﻿@* @inherits LayoutComponentBase
+
+@inject AuthenticationStateProvider AuthProvider
+
+@code {
+    private Type? layoutType;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        if (user.IsInRole("Admin"))
+        {
+            layoutType = typeof(AdminLayout); // Use AdminLayout for admin users
+        }
+        else if (user.Identity?.IsAuthenticated == true)
+        {
+            layoutType = typeof(MainLayout); // Use MainLayout for authenticated users
+        }
+        else
+        {
+            layoutType = null; // Use default layout for unauthenticated users
+        }
+    }
+}
+
+<LayoutView Layout="@layoutType">
+    @Body
+</LayoutView> *@

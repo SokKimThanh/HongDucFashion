@@ -1,0 +1,12 @@
+﻿@page "/admin/product/edit/{id:int}"
+@attribute [Authorize(Roles = "Admin")]
+@layout AdminLayout
+
+<h1>Edit product</h1>
+<p>San pham @id</p>
+
+
+@code {
+    [Parameter]
+    public int id { get; set; }
+}
