@@ -60,7 +60,7 @@ Hướng dẫn khởi động nhanh
 Clone project:
 ==============
 
-git clone https://github.com/yourusername/HongDucFashion.git
+git clone https://github.com/SokKimThanh/HongDucFashion.git
 
 cd HongDucFashion
 
@@ -92,6 +92,6 @@ MIT License
 
 - Tác giả: SOK KIM THANH / thanhsk1991@gmail.com
 
-- Github: https://github.com/sokkimthanh/HongDucFashion
+- Github: https://github.com/SokKimThanh/HongDucFashion
 
 **HongDucFashion** -- Nền tảng quản trị và bán hàng hiện đại, bảo mật, dễ mở rộng cho mọi doanh nghiệp!
